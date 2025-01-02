@@ -18,10 +18,10 @@ ALERT_SOUND_FILE = "alarm.wav"
 COOLDOWN_SECONDS = 90
 
 # Global Variables
-last_alert_timestamp = None  # Tracks last alert timestamp
-processed_lines = set()  # Tracks processed log lines
+last_alert_timestamp = None
+processed_lines = set()
 monitoring_active = False
-monitoring_started = False  # Tracks if monitoring has been initialized
+monitoring_started = False
 webhook_enabled = False
 webhook_url = ""
 
@@ -47,7 +47,7 @@ def parse_timestamp(line):
     match = re.match(r"\[\s*(\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2})\s*\]", line)
     if match:
         dt = datetime.strptime(match.group(1), "%Y.%m.%d %H:%M:%S")
-        return int(dt.timestamp())  # Convert to UNIX timestamp
+        return int(dt.timestamp())
     return None
 
 # Event handler for log file changes
