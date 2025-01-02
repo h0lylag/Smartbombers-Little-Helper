@@ -11,7 +11,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # Constants
-LOG_DIR = os.path.expanduser("~/Documents/EVE/logs/Gamelogs/test")
+LOG_DIR = os.path.expanduser("~/Documents/EVE/logs/Gamelogs")
 CONFIG_FILE = "settings.json"
 CAPITAL_REGEX = r"\(combat\).*(Dreadnought|Titan)"
 ALERT_SOUND_FILE = "alarm.wav"
@@ -157,22 +157,9 @@ def create_gui():
         webhook_url = webhook_entry.get()
         save_config()
 
-    def show_about():
-        about_text = (
-            "Smartbombers Little Helper\n"
-            "Version: 0.0.2\n\n"
-            "A tool for detecting capital spawns in EVE Online logs and alerting you."
-        )
-        messagebox.showinfo("About", about_text)
-
     root = tk.Tk()
-    root.title("Smartbombers Little Helper")
+    root.title("Smartbombers Little Helper - v0.0.2")
     root.resizable(False, False)
-
-    # Menu
-    menubar = Menu(root)
-    menubar.add_command(label="About", command=show_about)
-    root.config(menu=menubar)
 
     # Main Frame
     frame = ttk.Frame(root, padding=10)
@@ -180,7 +167,7 @@ def create_gui():
 
     # Alert Checkbox
     alert_var = tk.BooleanVar(value=True)
-    ttk.Checkbutton(frame, text="Capital Spawn Alert", variable=alert_var).grid(row=0, column=0, sticky="w")
+    ttk.Checkbutton(frame, text="Audible Capital Spawn Alert", variable=alert_var).grid(row=0, column=0, sticky="w")
 
     # Webhook Checkbox and Entry
     global webhook_var, webhook_entry
