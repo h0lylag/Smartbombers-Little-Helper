@@ -18,6 +18,7 @@ else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Constants
+VERSION_NUMBER = "v0.0.3"
 LOG_DIR = os.path.expanduser("~/Documents/EVE/logs/Gamelogs")
 CONFIG_FILE = os.path.join(BASE_DIR, "settings.json")
 CAPITAL_REGEX = r"\(combat\).*(Dreadnought|Titan)"
@@ -216,7 +217,7 @@ def create_gui():
         save_config()
 
     root = tk.Tk()
-    root.title("Smartbomber's Little Helper - v0.0.4")
+    root.title(f"Smartbomber's Little Helper - {VERSION_NUMBER}")
     root.resizable(False, False)
 
     # Main Frame
@@ -229,9 +230,9 @@ def create_gui():
     # Alert and Cooldown Settings
     audible_alert_enabled = tk.BooleanVar(value=True)
     ttk.Checkbutton(frame, text="Audible Alert", variable=audible_alert_enabled).grid(row=1, column=0, sticky="w", pady=(0, 0))
-    ttk.Label(frame, text="Alert Cooldown (s): ").grid(row=1, column=1, sticky="e", pady=(0, 0))
-    cooldown_spinbox = ttk.Spinbox(frame, from_=0, to=3600, width=6, increment=1)
-    cooldown_spinbox.grid(row=1, column=2, sticky="w", pady=(0, 5))
+    ttk.Label(frame, text="Alert Cooldown (s): ").grid(row=1, column=1, sticky="w", pady=(0, 0))
+    cooldown_spinbox = ttk.Spinbox(frame, from_=0, to=9999, width=6, increment=1)
+    cooldown_spinbox.grid(row=1, column=1, sticky="e", pady=(0, 0))
     cooldown_spinbox.delete(0, "end")
     cooldown_spinbox.insert(0, str(custom_cooldown_seconds))
 
@@ -281,7 +282,7 @@ def create_gui():
 
     # Save Button
     save_button = ttk.Button(frame, text="Apply Settings", command=save_settings)
-    save_button.grid(row=8, column=2, sticky="w", pady=10)
+    save_button.grid(row=8, column=1, sticky="e", pady=10)
 
     # Start/Stop Monitoring Button
     global monitor_button
@@ -291,7 +292,7 @@ def create_gui():
     # Status Label
     global status_label
     status_label = ttk.Label(frame, text="Ready", relief="sunken", anchor="w")
-    status_label.grid(row=9, column=0, columnspan=2, sticky="we", pady=(10, 0))
+    status_label.grid(row=9, column=0, columnspan=2, sticky="we", pady=(0, 0))
 
     root.mainloop()
 
