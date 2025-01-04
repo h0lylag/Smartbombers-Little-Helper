@@ -232,7 +232,7 @@ def create_gui():
     ttk.Checkbutton(frame, text="Audible Alert", variable=audible_alert_enabled).grid(row=1, column=0, sticky="w", pady=(0, 0))
     ttk.Label(frame, text="Alert Cooldown (s): ").grid(row=1, column=1, sticky="w", pady=(0, 0))
     cooldown_spinbox = ttk.Spinbox(frame, from_=0, to=9999, width=6, increment=1)
-    cooldown_spinbox.grid(row=1, column=1, sticky="e", pady=(0, 0))
+    cooldown_spinbox.grid(row=1, column=2, sticky="w", pady=(0))
     cooldown_spinbox.delete(0, "end")
     cooldown_spinbox.insert(0, str(custom_cooldown_seconds))
 
@@ -244,7 +244,7 @@ def create_gui():
     webhook_checkbox_var = tk.BooleanVar(value=webhook_enabled)
     ttk.Checkbutton(frame, text="Webhook: ", variable=webhook_checkbox_var, command=toggle_webhook).grid(row=3, column=0, sticky="w", pady=(0, 0))
     webhook_entry = ttk.Entry(frame, width=50)
-    webhook_entry.grid(row=3, column=1, columnspan=1, sticky="we", pady=(0, 0))
+    webhook_entry.grid(row=3, column=1, columnspan=3, sticky="we", pady=(0, 0))
     webhook_entry.insert(0, webhook_url)
     webhook_entry.config(state="normal" if webhook_enabled else "disabled")
 
@@ -259,7 +259,7 @@ def create_gui():
     role_check = ttk.Checkbutton(frame, text="@role (ID):", variable=mention_role_var, command=lambda: toggle_entry_state(role_entry, mention_role_var))
     role_check.grid(row=5, column=0, sticky="w")
     role_entry = ttk.Entry(frame, width=40)
-    role_entry.grid(row=5, column=1, sticky="we")
+    role_entry.grid(row=5, column=1, columnspan=3, sticky="we")
     role_entry.insert(0, role_id)
     role_entry.config(state="normal" if mention_role else "disabled")
 
@@ -267,7 +267,7 @@ def create_gui():
     user_check = ttk.Checkbutton(frame, text="@user (ID):", variable=mention_user_var, command=lambda: toggle_entry_state(user_entry, mention_user_var))
     user_check.grid(row=6, column=0, sticky="w")
     user_entry = ttk.Entry(frame, width=40)
-    user_entry.grid(row=6, column=1, sticky="we")
+    user_entry.grid(row=6, column=1, columnspan=3, sticky="we")
     user_entry.insert(0, user_id)
     user_entry.config(state="normal" if mention_user else "disabled")
 
@@ -276,13 +276,13 @@ def create_gui():
     custom_message_check = ttk.Checkbutton(frame, text="Custom Message: ", variable=custom_message_checkbox_var, command=lambda: toggle_entry_state(custom_message_entry, custom_message_checkbox_var))
     custom_message_check.grid(row=7, column=0, sticky="w", pady=(0, 0))
     custom_message_entry = ttk.Entry(frame, width=50)
-    custom_message_entry.grid(row=7, column=1, columnspan=1, sticky="we", pady=(0, 0))
+    custom_message_entry.grid(row=7, column=1, columnspan=3, sticky="we", pady=(0, 0))
     custom_message_entry.insert(0, custom_message)
     custom_message_entry.config(state="normal" if custom_message_enabled else "disabled")
 
     # Save Button
     save_button = ttk.Button(frame, text="Apply Settings", command=save_settings)
-    save_button.grid(row=8, column=1, sticky="e", pady=10)
+    save_button.grid(row=8, column=2, sticky="e", pady=10)
 
     # Start/Stop Monitoring Button
     global monitor_button
@@ -292,7 +292,7 @@ def create_gui():
     # Status Label
     global status_label
     status_label = ttk.Label(frame, text="Ready", relief="sunken", anchor="w")
-    status_label.grid(row=9, column=0, columnspan=2, sticky="we", pady=(0, 0))
+    status_label.grid(row=9, column=0, columnspan=4, sticky="we", pady=(0, 0))
 
     root.mainloop()
 
