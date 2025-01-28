@@ -41,10 +41,12 @@ user_id = ""
 custom_message = "Capital ship detected!"
 custom_message_enabled = False
 custom_cooldown_seconds = DEFAULT_COOLDOWN_SECONDS
+excluded_toons_enabled = False
+excluded_toons = []
 
 # Load and save config
 def load_config():
-    global webhook_enabled, webhook_url, mention_everyone, mention_here, mention_role, mention_user, role_id, user_id, custom_message, custom_message_enabled, custom_cooldown_seconds
+    global webhook_enabled, webhook_url, mention_everyone, mention_here, mention_role, mention_user, role_id, user_id, custom_message, custom_message_enabled, custom_cooldown_seconds, excluded_toons_enabled, excluded_toons
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, "r") as file:
             config = json.load(file)
@@ -59,6 +61,8 @@ def load_config():
             custom_message = config.get("custom_message", "Capital ship detected!")
             custom_message_enabled = config.get("custom_message_enabled", False)
             custom_cooldown_seconds = config.get("custom_cooldown_seconds", DEFAULT_COOLDOWN_SECONDS)
+            excluded_toons_enabled = config.get("excluded_toons_enabled", False)
+            excluded_toons = [toon.strip() for toon in config.get("excluded_toons", "").split(",")]
 
 def save_config():
     config = {
@@ -72,7 +76,9 @@ def save_config():
         "user_id": user_id,
         "custom_message": custom_message,
         "custom_message_enabled": custom_message_enabled,
-        "custom_cooldown_seconds": custom_cooldown_seconds
+        "custom_cooldown_seconds": custom_cooldown_seconds,
+        "excluded_toons_enabled": excluded_toons_enabled,
+        "excluded_toons": ", ".join(excluded_toons)
     }
     with open(CONFIG_FILE, "w") as file:
         json.dump(config, file, indent=4)
@@ -85,6 +91,17 @@ def parse_timestamp(line):
         return int(dt.timestamp())
     return None
 
+# Check if the file belongs to an excluded toon
+def is_excluded_toon(header_lines):
+    if not excluded_toons_enabled:
+        return False
+    for line in header_lines:
+        match = re.search(r"Listener: (.+)", line)
+        if match:
+            toon_name = match.group(1).strip()
+            return toon_name in excluded_toons
+    return False
+
 # Event handler for log file changes
 class CapitalLogHandler(FileSystemEventHandler):
     def on_modified(self, event):
@@ -93,6 +110,10 @@ class CapitalLogHandler(FileSystemEventHandler):
             try:
                 with open(event.src_path, "r", encoding="utf-8", errors="ignore") as file:
                     lines = file.readlines()
+                    header = lines[:4]
+                    if is_excluded_toon(header):
+                        print(f"Skipping excluded toon log: {event.src_path}")
+                        return
 
                     if not monitoring_started:
                         # On first start, update last_alert_timestamp to avoid stale alerts
@@ -183,7 +204,8 @@ def update_status(message):
 
 # GUI Interface
 def create_gui():
-    global status_label, audible_alert_enabled
+    global status_label, audible_alert_enabled, excluded_toons_entry, exclude_toons_var
+
     def toggle_monitoring():
         if monitor_button["text"] == "Start Monitoring":
             start_monitoring()
@@ -202,7 +224,7 @@ def create_gui():
         entry.config(state="normal" if checkbox_var.get() else "disabled")
 
     def save_settings():
-        global webhook_enabled, webhook_url, mention_everyone, mention_here, mention_role, mention_user, role_id, user_id, custom_message, custom_message_enabled, custom_cooldown_seconds
+        global webhook_enabled, webhook_url, mention_everyone, mention_here, mention_role, mention_user, role_id, user_id, custom_message, custom_message_enabled, custom_cooldown_seconds, excluded_toons_enabled, excluded_toons
         webhook_enabled = webhook_checkbox_var.get()
         webhook_url = webhook_entry.get()
         mention_everyone = mention_everyone_var.get()
@@ -214,6 +236,8 @@ def create_gui():
         custom_message_enabled = custom_message_checkbox_var.get()
         custom_message = custom_message_entry.get()
         custom_cooldown_seconds = int(cooldown_spinbox.get())
+        excluded_toons_enabled = exclude_toons_var.get()
+        excluded_toons = [toon.strip() for toon in excluded_toons_entry.get().split(",")]
         save_config()
 
     root = tk.Tk()
@@ -280,19 +304,29 @@ def create_gui():
     custom_message_entry.insert(0, custom_message)
     custom_message_entry.config(state="normal" if custom_message_enabled else "disabled")
 
+    # Exclude Toons
+    exclude_toons_var = tk.BooleanVar(value=excluded_toons_enabled)
+    exclude_toons_check = ttk.Checkbutton(frame, text="Exclude Toons:", variable=exclude_toons_var, command=lambda: toggle_entry_state(excluded_toons_entry, exclude_toons_var))
+    exclude_toons_check.grid(row=8, column=0, sticky="w", pady=(0, 0))
+    ttk.Label(frame, text="(Comma separated)").grid(row=9, column=0, sticky="w", padx=(20, 0))
+    excluded_toons_entry = ttk.Entry(frame, width=50)
+    excluded_toons_entry.grid(row=8, column=1, columnspan=3, sticky="we", pady=(0, 0))
+    excluded_toons_entry.insert(0, ", ".join(excluded_toons))
+    excluded_toons_entry.config(state="normal" if excluded_toons_enabled else "disabled")
+
     # Save Button
     save_button = ttk.Button(frame, text="Apply Settings", command=save_settings)
-    save_button.grid(row=8, column=2, sticky="e", pady=10)
+    save_button.grid(row=10, column=2, sticky="e", pady=10)
 
     # Start/Stop Monitoring Button
     global monitor_button
     monitor_button = ttk.Button(frame, text="Start Monitoring", command=toggle_monitoring)
-    monitor_button.grid(row=8, column=0, sticky="w", pady=10)
+    monitor_button.grid(row=10, column=0, sticky="w", pady=10)
 
     # Status Label
     global status_label
     status_label = ttk.Label(frame, text="Ready", relief="sunken", anchor="w")
-    status_label.grid(row=9, column=0, columnspan=4, sticky="we", pady=(0, 0))
+    status_label.grid(row=11, column=0, columnspan=4, sticky="we", pady=(0, 0))
 
     root.mainloop()
 
