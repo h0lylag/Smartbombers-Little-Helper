@@ -18,7 +18,7 @@ else:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Constants
-VERSION_NUMBER = "v0.0.3"
+VERSION_NUMBER = "v0.0.4"
 LOG_DIR = os.path.expanduser("~/Documents/EVE/logs/Gamelogs")
 CONFIG_FILE = os.path.join(BASE_DIR, "settings.json")
 CAPITAL_REGEX = r"\(combat\).*(Dreadnought|Titan)"
